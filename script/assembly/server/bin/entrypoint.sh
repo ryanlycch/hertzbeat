@@ -44,7 +44,10 @@ if [ ! -d $LOGS_DIR ]; then
 fi
 
 # JVM Configuration
-JAVA_MEM_OPTS=" -server -XX:SurvivorRatio=6 -XX:+UseParallelGC "
+JAVA_OPTS=" -Doracle.jdbc.timezoneAsRegion=false"
+
+# JVM Configuration
+JAVA_MEM_OPTS=" -server -XX:SurvivorRatio=6 -XX:+UseParallelGC -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$LOGS_DIR"
 
 # 加载外部log文件的配置
 LOG_IMPL_FILE=logback-spring.xml
@@ -54,5 +57,5 @@ then
     LOGGING_CONFIG="-Dlogging.config=$CONF_DIR/$LOG_IMPL_FILE"
 fi
 CONFIG_FILES=" -Dlogging.path=$LOGS_DIR $LOGGING_CONFIG -Dspring.config.location=$CONF_DIR/ "
-echo -e "Starting the $SERVER_NAME ..."
-java $JAVA_MEM_OPTS $CONFIG_FILES -jar $DEPLOY_DIR/$JAR_NAME --spring.profiles.active=prod
+echo -e "Starting the HertzBeat $SERVER_NAME ..."
+java $JAVA_OPTS $JAVA_MEM_OPTS $CONFIG_FILES -jar $DEPLOY_DIR/$JAR_NAME --spring.profiles.active=prod

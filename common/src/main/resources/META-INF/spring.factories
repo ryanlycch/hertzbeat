@@ -15,6 +15,4 @@
 
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.usthe.common.config.CommonProperties,\
-com.usthe.common.config.CommonConfig,\
-com.usthe.common.support.SpringContextHolder
+org.dromara.hertzbeat.common.config.CommonConfig

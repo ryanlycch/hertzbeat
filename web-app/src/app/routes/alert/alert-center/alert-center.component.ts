@@ -81,13 +81,33 @@ export class AlertCenterComponent implements OnInit {
       );
   }
 
+  renderAlertTarget(target: string): string {
+    if (target == undefined || target === '') {
+      return target;
+    }
+    const targets = target.split('.');
+    if (targets.length === 3) {
+      let app = this.i18nSvc.fanyi(`monitor.app.${targets[0]}`);
+      let metrics = this.i18nSvc.fanyi(`monitor.app.${targets[0]}.metrics.${targets[1]}`);
+      let metric = this.i18nSvc.fanyi(`monitor.app.${targets[0]}.metrics.${targets[1]}.metric.${targets[2]}`);
+      let value = app == `monitor.app.${targets[0]}` ? targets[0] : app;
+      value += ` / ${metrics == `monitor.app.${targets[0]}.metrics.${targets[1]}` ? targets[1] : metrics}`;
+      value += ` / ${metric == `monitor.app.${targets[0]}.metrics.${targets[1]}.metric.${targets[2]}` ? targets[2] : metric}`;
+      return value;
+    }
+    if (target === 'availability') {
+      return this.i18nSvc.fanyi('monitor.availability');
+    }
+    return target;
+  }
+
   onDeleteAlerts() {
     if (this.checkedAlertIds == null || this.checkedAlertIds.size === 0) {
-      this.notifySvc.warning(this.i18nSvc.fanyi('alert.center.notify.no-delete'), '');
+      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-delete'), '');
       return;
     }
     this.modal.confirm({
-      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.delete-batch'),
+      nzTitle: this.i18nSvc.fanyi('common.confirm.delete-batch'),
       nzOkText: this.i18nSvc.fanyi('common.button.ok'),
       nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
@@ -173,6 +193,7 @@ export class AlertCenterComponent implements OnInit {
         deleteAlerts$.unsubscribe();
         if (message.code === 0) {
           this.notifySvc.success(this.i18nSvc.fanyi('common.notify.delete-success'), '');
+          this.updatePageIndex(alertIds.size);
           this.loadAlertsTable();
         } else {
           this.tableLoading = false;
@@ -185,6 +206,11 @@ export class AlertCenterComponent implements OnInit {
         this.notifySvc.error(this.i18nSvc.fanyi('common.notify.delete-fail'), error.msg);
       }
     );
+  }
+
+  updatePageIndex(delSize: number) {
+    const lastPage = Math.max(1, Math.ceil((this.total - delSize) / this.pageSize));
+    this.pageIndex = this.pageIndex > lastPage ? lastPage : this.pageIndex;
   }
 
   clearAllAlerts() {

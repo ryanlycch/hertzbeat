@@ -37,9 +37,14 @@ export class MonitorDataChartComponent implements OnInit {
   constructor(private monitorSvc: MonitorService, @Inject(ALAIN_I18N_TOKEN) private i18nSvc: I18NService) {}
 
   ngOnInit(): void {
+    let metricsI18n = this.i18nSvc.fanyi(`monitor.app.${this.app}.metrics.${this.metrics}`);
+    let metricI18n = this.i18nSvc.fanyi(`monitor.app.${this.app}.metrics.${this.metrics}.metric.${this.metric}`);
+    let title = `${metricsI18n == `monitor.app.${this.app}.metrics.${this.metrics}` ? this.metrics : metricsI18n}/${
+      metricI18n == `monitor.app.${this.app}.metrics.${this.metrics}.metric.${this.metric}` ? this.metric : metricI18n
+    }`;
     this.lineHistoryTheme = {
       title: {
-        text: `${this.metrics}.${this.metric}`,
+        text: title,
         textStyle: {
           fontSize: 16,
           fontFamily: 'monospace',
@@ -106,7 +111,7 @@ export class MonitorDataChartComponent implements OnInit {
               }
             },
             onclick: () => {
-              this.loadData('1d');
+              this.loadData('1D');
             }
           },
           myPeriod1w: {
@@ -119,7 +124,7 @@ export class MonitorDataChartComponent implements OnInit {
               }
             },
             onclick: () => {
-              this.loadData('1w');
+              this.loadData('1W', true);
             }
           },
           myPeriod4w: {
@@ -132,7 +137,7 @@ export class MonitorDataChartComponent implements OnInit {
               }
             },
             onclick: () => {
-              this.loadData('4w');
+              this.loadData('4W', true);
             }
           },
           myPeriod3m: {
@@ -145,7 +150,7 @@ export class MonitorDataChartComponent implements OnInit {
               }
             },
             onclick: () => {
-              this.loadData('12w');
+              this.loadData('12W', true);
             }
           },
           myRefresh: {
@@ -164,28 +169,22 @@ export class MonitorDataChartComponent implements OnInit {
         }
       },
       tooltip: {
-        trigger: 'axis',
-        formatter: function (params: any) {
-          let time: number = params[0].value[0];
-          var date = new Date(time);
-          let seriesName = params[0].seriesName;
-          let month = (date.getMonth() + 1).toString().padStart(2, '0');
-          let day = date.getDate().toString().padStart(2, '0');
-          if (seriesName == null || seriesName == 'NULL') {
-            return `${date.getFullYear()}/${month}/${day} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} -- ${
-              params[0].value[1]
-            }`;
-          } else {
-            return `${seriesName} ${date.getFullYear()}/${month}/${day} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} -- ${
-              params[0].value[1]
-            }`;
-          }
-        }
+        trigger: 'axis'
+      },
+      grid: {
+        left: '2',
+        containLabel: true
       },
       xAxis: {
         type: 'time',
         splitLine: {
           show: false
+        },
+        axisTick: {
+          show: true
+        },
+        axisLine: {
+          onZero: false
         }
       },
       yAxis: {
@@ -198,19 +197,22 @@ export class MonitorDataChartComponent implements OnInit {
     };
     if (this.unit != undefined || this.unit != null) {
       // @ts-ignore
-      this.lineHistoryTheme.title?.subtext = `${this.i18nSvc.fanyi('monitors.detail.chart.unit')}  ${this.unit}`;
+      this.lineHistoryTheme.title.subtext = `${this.i18nSvc.fanyi('monitors.detail.chart.unit')}  ${this.unit}`;
     }
     this.loadData();
   }
 
-  loadData(timePeriod?: string) {
+  loadData(timePeriod?: string, isInterval?: boolean) {
     if (timePeriod != undefined) {
       this.timePeriod = timePeriod;
+    }
+    if (isInterval == undefined) {
+      isInterval = false;
     }
     // 读取指标历史数据
     this.loading = true;
     let metricData$ = this.monitorSvc
-      .getMonitorMetricHistoryData(this.monitorId, this.app, this.metrics, this.metric, this.timePeriod, false)
+      .getMonitorMetricHistoryData(this.monitorId, this.app, this.metrics, this.metric, this.timePeriod, isInterval)
       .pipe(
         finalize(() => {
           this.loading = false;
@@ -225,7 +227,44 @@ export class MonitorDataChartComponent implements OnInit {
             Object.keys(values).forEach(key => {
               legend.push(key);
             });
-            if (legend.length > 1) {
+            if (!isInterval || legend.length > 1) {
+              if (legend.length > 1) {
+                this.lineHistoryTheme.legend = {
+                  type: 'scroll',
+                  orient: 'horizontal',
+                  align: 'auto',
+                  bottom: 40,
+                  pageIconSize: 10,
+                  pageButtonGap: 10,
+                  pageButtonPosition: 'end',
+                  data: legend
+                };
+              }
+              this.lineHistoryTheme.series = [];
+              let valueKeyArr = Object.keys(values);
+              for (let index = 0; index < valueKeyArr.length; index++) {
+                let key = valueKeyArr[index];
+                let seriesData: Array<{ value: any }> = [];
+                values[key].forEach((item: { time: number; origin: any }) => {
+                  seriesData.push({
+                    value: [item.time, item.origin]
+                  });
+                });
+                this.lineHistoryTheme.series.push({
+                  name: key,
+                  type: 'line',
+                  stack: 'Total',
+                  smooth: true,
+                  showSymbol: false,
+                  areaStyle: {},
+                  emphasis: {
+                    focus: 'series'
+                  },
+                  data: seriesData
+                });
+              }
+            } else {
+              legend = ['Max', 'Min', 'Mean'];
               this.lineHistoryTheme.legend = {
                 orient: 'vertical',
                 align: 'auto',
@@ -233,28 +272,58 @@ export class MonitorDataChartComponent implements OnInit {
                 top: '10%',
                 data: legend
               };
-            }
-            this.lineHistoryTheme.series = [];
-            let maxLegend = 5;
-            let valueKeyArr = Object.keys(values);
-            for (let index = 0; index < valueKeyArr.length; index++) {
-              if (maxLegend-- <= 0) {
-                break;
-              }
-              let key = valueKeyArr[index];
-              let seriesData: Array<{ value: any }> = [];
-              values[key].forEach((item: { time: number; origin: any }) => {
-                seriesData.push({
-                  value: [item.time, item.origin]
+              let maxSeriesData: Array<{ value: any }> = [];
+              let minSeriesData: Array<{ value: any }> = [];
+              let meanSeriesData: Array<{ value: any }> = [];
+              this.lineHistoryTheme.series = [];
+              if (values != undefined && Object.keys(values).length > 0) {
+                values[Object.keys(values)[0]].forEach((item: { time: number; mean: any; max: any; min: any }) => {
+                  maxSeriesData.push({
+                    value: [item.time, item.max]
+                  });
+                  minSeriesData.push({
+                    value: [item.time, item.min]
+                  });
+                  meanSeriesData.push({
+                    value: [item.time, item.mean]
+                  });
                 });
-              });
-              // @ts-ignore
+              }
               this.lineHistoryTheme.series.push({
-                name: key,
+                name: 'Max',
                 type: 'line',
                 smooth: true,
                 showSymbol: false,
-                data: seriesData
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                  focus: 'series'
+                },
+                data: maxSeriesData
+              });
+              this.lineHistoryTheme.series.push({
+                name: 'Min',
+                type: 'line',
+                smooth: true,
+                showSymbol: false,
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                  focus: 'series'
+                },
+                data: minSeriesData
+              });
+              this.lineHistoryTheme.series.push({
+                name: 'Mean',
+                type: 'line',
+                smooth: true,
+                showSymbol: false,
+                stack: 'Total',
+                areaStyle: {},
+                emphasis: {
+                  focus: 'series'
+                },
+                data: meanSeriesData
               });
             }
             this.eChartOption = this.lineHistoryTheme;

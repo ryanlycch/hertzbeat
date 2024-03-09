@@ -7,16 +7,35 @@ import Slider from "react-slick";
 
 const iconCommonUrl = '/img/icons/'
 
+// const cdnUrl = '/img/icons/'
+
 var settings = {
-    dots: false,
     infinite: true,
-    speed: 800,
+    speed: 400,
     slidesToShow: 6,
     slidesToScroll: 1,
     autoplay: true,
-    autoplaySpeed: 800,
+    autoplaySpeed: 1000,
     rows: 1,
-    vertical: false
+    responsive : [
+        {
+            breakpoint : 1024,
+            settings : {
+                slidesToShow : 2.75,
+                slidesToScroll : 3,
+                speed : 2000,
+                infinite : true,
+            },
+        },
+        {
+            breakpoint : 480,
+            settings : {
+                speed : 2000,
+                slidesToShow : 0.75,
+                slidesToScroll : 1,
+            }
+        }
+    ],
 };
 
 export default class LogoCarousel extends React.Component {
@@ -45,6 +64,7 @@ export default class LogoCarousel extends React.Component {
             <>
                 <div className={styles.companyUsage} ref={this.containerRef}>
                     <h3>{this.props.headerTitle}</h3>
+                    <br/>
                     <div className={clsx(styles.logos)}>
                         {this.list()}
                     </div>

@@ -11,6 +11,8 @@ mvnw
 mvnw.bat
 *.log
 package-lock.json
+*.zip
+jdk/
 
 ### STS ###
 .apt_generated

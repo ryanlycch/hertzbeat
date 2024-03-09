@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/operators';
 
 import { Tag } from '../../../pojo/Tag';
 import { TagService } from '../../../service/tag.service';
+import { formatTagName } from '../../../shared/utils/common-util';
 
 @Component({
   selector: 'app-setting-tags',
@@ -65,11 +66,11 @@ export class SettingTagsComponent implements OnInit {
 
   onDeleteTags() {
     if (this.checkedTagIds == null || this.checkedTagIds.size === 0) {
-      this.notifySvc.warning(this.i18nSvc.fanyi('alert.center.notify.no-delete'), '');
+      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-delete'), '');
       return;
     }
     this.modal.confirm({
-      nzTitle: this.i18nSvc.fanyi('alert.center.confirm.delete-batch'),
+      nzTitle: this.i18nSvc.fanyi('common.confirm.delete-batch'),
       nzOkText: this.i18nSvc.fanyi('common.button.ok'),
       nzCancelText: this.i18nSvc.fanyi('common.button.cancel'),
       nzOkDanger: true,
@@ -100,6 +101,7 @@ export class SettingTagsComponent implements OnInit {
         deleteTags$.unsubscribe();
         if (message.code === 0) {
           this.notifySvc.success(this.i18nSvc.fanyi('common.notify.delete-success'), '');
+          this.updatePageIndex(tagIds.size);
           this.loadTagsTable();
         } else {
           this.tableLoading = false;
@@ -112,6 +114,11 @@ export class SettingTagsComponent implements OnInit {
         this.notifySvc.error(this.i18nSvc.fanyi('common.notify.delete-fail'), error.msg);
       }
     );
+  }
+
+  updatePageIndex(delSize: number) {
+    const lastPage = Math.max(1, Math.ceil((this.total - delSize) / this.pageSize));
+    this.pageIndex = this.pageIndex > lastPage ? lastPage : this.pageIndex;
   }
 
   // begin: 列表多选分页逻辑
@@ -162,6 +169,9 @@ export class SettingTagsComponent implements OnInit {
     if (this.tag.value != undefined) {
       this.tag.value = this.tag.value.trim();
     }
+    if (this.tag.description != undefined) {
+      this.tag.description = this.tag.description.trim();
+    }
     if (this.isManageModalAdd) {
       const modalOk$ = this.tagService
         .newTag(this.tag)
@@ -211,4 +221,5 @@ export class SettingTagsComponent implements OnInit {
     }
   }
   // end 新增修改告警定义model
+  protected readonly formatTagName = formatTagName;
 }

@@ -1,6 +1,6 @@
 const path = require('path')
 
-const organizationName = 'dromara' // Usually your GitHub org/user name.
+const organizationName = 'dromara' // Usually your GitHub name.
 const projectName = 'hertzbeat' // Usually your repo name.
 const branch = 'master'
 const repoUrl = `https://github.com/dromara/${projectName}`
@@ -8,7 +8,7 @@ const cdnUrl = 'https://cdn.jsdelivr.net/gh/dromara/hertzbeat@gh-pages'
 
 module.exports = {
   title: 'HertzBeat',
-  tagline: '易用友好的实时监控系统',
+  tagline: 'An open source, real-time monitoring tool with custom-monitor and agentLess.',
   url: 'https://hertzbeat.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -21,7 +21,7 @@ module.exports = {
     cdnUrl,
   },
   i18n: {
-    defaultLocale: 'zh-cn',
+    defaultLocale: 'en',
     locales: ['zh-cn', 'en'],
   },
   themeConfig: {
@@ -46,15 +46,15 @@ module.exports = {
       additionalLanguages: ['java'],
     },
     algolia: {
-      apiKey: 'c7c84bfcc1495156f5730309d821ba8c',
-      indexName: 'sureness',
-      appId: 'GNVT7Z0UI2',
+      apiKey: '9298a61d23b2842ce077324283fb0abb',
+      indexName: 'hertzbeat',
+      appId: 'JMM99UL1H5',
       contextualSearch: true,
     },
     announcementBar: {
       id: 'github-star',
       content:
-        '<font style="font-size: medium; font-weight: bolder">If you like HertzBeat,</font> <a target="_blank" style="font-size: medium; font-weight: bolder" rel="noopener noreferrer" href="https://github.com/dromara/hertzbeat">give us a star on GitHub </a> <font style="font-size: medium; font-weight: bolder"> or </font><a target="_blank" style="font-size: medium; font-weight: bolder" rel="noopener noreferrer" href="https://gitee.com/dromara/hertzbeat">Gitee please! </a>⭐️⭐️',
+        '<font style="font-size: medium; font-weight: bolder">If you like HertzBeat,</font> <a target="_blank" style="font-size: medium; font-weight: bolder" rel="noopener noreferrer" href="https://github.com/dromara/hertzbeat">star us on GitHub </a> <font style="font-size: medium; font-weight: bolder"> or </font><a target="_blank" style="font-size: medium; font-weight: bolder" rel="noopener noreferrer" href="https://gitee.com/dromara/hertzbeat">Gitee! </a>⭐️⭐️',
       backgroundColor: '#7228B5',
       textColor: '#fafbfc',
       isCloseable: true,
@@ -62,60 +62,63 @@ module.exports = {
     navbar: {
       title: 'HertzBeat',
       logo: {
-        alt: '易用友好的高性能监控云',
+        alt: 'An open source, real-time monitoring tool with custom-monitor and agentLess.',
         src: '/img/tancloud-logo.svg',
       },
       items: [
         {
-          label: '首页',
+          label: 'Docs',
           position: 'left',
-          to: '/',
+          to: '/docs/',
         },
         {
-          label: '文档',
+          label: 'blog',
           position: 'left',
-          to: 'docs/',
+          to: '/blog/',
         },
         {
-          label: '博客',
-          position: 'left',
-          to: 'blog/',
-        },
-        {
-          label: '讨论交流',
-          position: 'left',
-          to: 'docs/others/contact',
-        },
-        {
-          label: '私有化部署',
-          position: 'left',
-          to: 'docs/others/private',
-        },
-        {
-          label: '关于',
+          label: 'Others',
           position: 'left',
           items: [
             {
-              label: '贡献者指南',
-              to: 'docs/others/contributing',
+              label: 'discuss',
+              to: '/docs/others/contact',
             },
             {
-              label: '项目看板',
-              href: 'https://github.com/dromara/hertzbeat/projects/1',
+              label: 'contributors',
+              to: '/docs/others/developer',
             },
             {
-              label: '设计文档',
-              to: 'docs/others/design',
+              label: 'contributing',
+              to: '/docs/others/contributing',
             },
             {
-              label: '赞助我们',
-              to: 'docs/others/sponsor',
+              label: 'kanban',
+              href: 'https://github.com/orgs/dromara/projects/6',
             },
             {
-              label: '相关资源',
-              to: 'docs/others/resource',
+              label: 'design',
+              to: '/docs/others/design',
             },
+            {
+              label: 'sponsor',
+              to: '/docs/others/sponsor',
+            },
+            {
+              label: 'resource',
+              to: '/docs/others/resource',
+            }
           ],
+        },
+        {
+          label: '开源之夏',
+          position: 'left',
+          href: 'https://summer-ospp.ac.cn/org/orgdetail/bef415f7-741e-4db8-a4ff-b3904c502471',
+        },
+        {
+          label: '华为云开源活动',
+          position: 'left',
+          to: '/docs/others/huaweicloud',
         },
         {
           type: 'docsVersionDropdown',
@@ -128,7 +131,7 @@ module.exports = {
           position: 'right',
         },
         {
-          label: '登录/注册',
+          label: 'login',
           href: 'https://console.tancloud.cn',
           position: 'right',
           className: 'header-console-link',
@@ -139,61 +142,61 @@ module.exports = {
       style: 'light',
       links: [
         {
-          title: '产品介绍',
+          title: 'intro',
           items: [
             {
-              label: '使用介绍',
-              to: 'docs/',
+              label: 'use',
+              to: '/docs/',
             },
             {
-              label: '安装文档',
-              to: 'docs/start/quickstart',
+              label: 'quickstart',
+              to: '/docs/start/quickstart',
             },
             {
-              label: '自定义监控',
-              to: 'docs/advanced/extend-point',
+              label: 'custom',
+              to: '/docs/advanced/extend-point',
             },
             {
-              label: '帮助文档',
-              to: 'docs/help/guide',
+              label: 'help',
+              to: '/docs/help/guide',
             },
           ],
         },
         {
-          title: '社区交流',
+          title: 'contact',
           items: [
             {
-              label: 'Dromara开源社区',
+              label: 'dromara',
               href: 'https://dromara.org/',
             },
             {
-              label: '交流联系',
-              to: 'docs/others/contact',
+              label: 'discuss',
+              to: '/docs/others/contact',
             },
             {
-              label: '我们的故事',
+              label: 'team',
               href: 'https://support.qq.com/products/379369/team',
             },
             {
-              label: 'TanCloud探云',
+              label: 'tancloud',
               href: 'https://tancloud.cn',
             },
           ],
         },
         {
-          title: '相关资源',
+          title: 'resource',
           items: [
             {
-              label: 'Github仓库',
+              label: 'github',
               href: 'https://github.com/dromara/hertzbeat',
             },
             {
-              label: 'Gitee仓库',
+              label: 'gitee',
               href: 'https://gitee.com/dromara/hertzbeat',
             },
             {
-              label: '相关资源',
-              to: 'docs/others/resource',
+              label: 'relate',
+              to: '/docs/others/resource',
             },
           ],
         },
@@ -205,7 +208,7 @@ module.exports = {
       },
       copyright:
         '<a target="_blank" href="https://beian.miit.gov.cn/">蜀ICP备2022002218号</a>' +
-        ` | Copyright TANCLOUD© ${new Date().getFullYear()}`,
+        ` | Copyright © 2021-${new Date().getFullYear()} TANCLOUD`,
     },
   },
   presets: [
@@ -223,14 +226,14 @@ module.exports = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: 'v1.1.x',
+              label: 'current',
               path: '',
             },
           },
         },
         blog: {
           showReadingTime: true,
-          postsPerPage: 3,
+          postsPerPage: 1,
           feedOptions: {
             type: 'all',
             copyright: `Copyright © ${new Date().getFullYear()} TANCLOUD, Inc.`,
@@ -238,6 +241,7 @@ module.exports = {
           // Please change this to your repo.
           editUrl: `${repoUrl}/edit/${branch}/home/`,
           editLocalizedFiles: true,
+          blogSidebarCount: 'ALL'
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),

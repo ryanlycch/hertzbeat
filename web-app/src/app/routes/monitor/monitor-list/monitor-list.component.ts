@@ -4,11 +4,16 @@ import { I18NService } from '@core';
 import { ALAIN_I18N_TOKEN } from '@delon/theme';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { ModalButtonOptions } from 'ng-zorro-antd/modal/modal-types';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { NzUploadChangeParam } from 'ng-zorro-antd/upload';
+import { finalize } from 'rxjs/operators';
 
 import { Monitor } from '../../../pojo/Monitor';
+import { MemoryStorageService } from '../../../service/memory-storage.service';
 import { MonitorService } from '../../../service/monitor.service';
+import { formatTagName } from '../../../shared/utils/common-util';
 
 @Component({
   selector: 'app-monitor-list',
@@ -21,28 +26,45 @@ export class MonitorListComponent implements OnInit {
     private router: Router,
     private modal: NzModalService,
     private notifySvc: NzNotificationService,
-    private msg: NzMessageService,
     private monitorSvc: MonitorService,
     private messageSvc: NzMessageService,
+    private storageSvc: MemoryStorageService,
     @Inject(ALAIN_I18N_TOKEN) private i18nSvc: I18NService
   ) {}
 
-  app!: string;
+  app!: string | undefined;
+  tag!: string | undefined;
   pageIndex: number = 1;
   pageSize: number = 8;
   total: number = 0;
   monitors!: Monitor[];
   tableLoading: boolean = true;
   checkedMonitorIds = new Set<number>();
+  isSwitchExportTypeModalVisible = false;
+  exportJsonButtonLoading = false;
+  exportYamlButtonLoading = false;
+  exportExcelButtonLoading = false;
   // 过滤搜索
   filterContent!: string;
   filterStatus: number = 9;
 
+  switchExportTypeModalFooter: ModalButtonOptions[] = [
+    { label: this.i18nSvc.fanyi('common.button.cancel'), type: 'default', onClick: () => (this.isSwitchExportTypeModalVisible = false) }
+  ];
+
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(paramMap => {
-      this.app = paramMap.get('app') || '';
-      if (this.app == '') {
-        this.router.navigateByUrl('/monitors?app=website');
+      let appStr = paramMap.get('app');
+      let tagStr = paramMap.get('tag');
+      if (tagStr != null) {
+        this.tag = tagStr;
+      } else {
+        this.tag = undefined;
+      }
+      if (appStr != null) {
+        this.app = appStr;
+      } else {
+        this.app = undefined;
       }
       this.pageIndex = 1;
       this.pageSize = 8;
@@ -55,7 +77,7 @@ export class MonitorListComponent implements OnInit {
   onFilterSearchMonitors() {
     this.tableLoading = true;
     let filter$ = this.monitorSvc
-      .searchMonitors(this.app, this.filterContent, this.filterStatus, this.pageIndex - 1, this.pageSize)
+      .searchMonitors(this.app, this.tag, this.filterContent, this.filterStatus, this.pageIndex - 1, this.pageSize)
       .subscribe(
         message => {
           filter$.unsubscribe();
@@ -83,9 +105,28 @@ export class MonitorListComponent implements OnInit {
     this.loadMonitorTable();
   }
 
-  loadMonitorTable() {
+  clearCurrentTag() {
+    this.router.navigateByUrl(`/monitors`);
+  }
+
+  getAppIconName(app: string | undefined): string {
+    let hierarchy: any[] = this.storageSvc.getData('hierarchy');
+    let find = hierarchy.find((item: { category: string; value: string }) => {
+      return item.value == app;
+    });
+    if (find == undefined) {
+      return this.i18nSvc.fanyi('monitor_icon.center');
+    }
+    let icon = this.i18nSvc.fanyi(`monitor_icon.${find.category}`);
+    if (icon == `monitor_icon.${find.category}`) {
+      return this.i18nSvc.fanyi('monitor_icon.center');
+    }
+    return icon;
+  }
+
+  loadMonitorTable(sortField?: string | null, sortOrder?: string | null) {
     this.tableLoading = true;
-    let monitorInit$ = this.monitorSvc.getMonitors(this.app, this.pageIndex - 1, this.pageSize).subscribe(
+    let monitorInit$ = this.monitorSvc.getMonitors(this.app, this.tag, this.pageIndex - 1, this.pageSize, sortField, sortOrder).subscribe(
       message => {
         this.tableLoading = false;
         this.checkedAll = false;
@@ -106,6 +147,31 @@ export class MonitorListComponent implements OnInit {
       }
     );
   }
+  changeMonitorTable(sortField?: string | null, sortOrder?: string | null) {
+    this.tableLoading = true;
+    let monitorInit$ = this.monitorSvc
+      .searchMonitors(this.app, this.tag, this.filterContent, this.filterStatus, this.pageIndex - 1, this.pageSize, sortField, sortOrder)
+      .subscribe(
+        message => {
+          this.tableLoading = false;
+          this.checkedAll = false;
+          this.checkedMonitorIds.clear();
+          if (message.code === 0) {
+            let page = message.data;
+            this.monitors = page.content;
+            this.pageIndex = page.number + 1;
+            this.total = page.totalElements;
+          } else {
+            console.warn(message.msg);
+          }
+          monitorInit$.unsubscribe();
+        },
+        error => {
+          this.tableLoading = false;
+          monitorInit$.unsubscribe();
+        }
+      );
+  }
 
   onEditOneMonitor(monitorId: number) {
     if (monitorId == null) {
@@ -115,21 +181,6 @@ export class MonitorListComponent implements OnInit {
     this.router.navigateByUrl(`/monitors/${monitorId}/edit`);
     // 参数样例
     // this.router.navigate(['/monitors/new'],{queryParams: {app: "linux"}});
-  }
-
-  onEditMonitor() {
-    // 编辑时只能选中一个监控
-    if (this.checkedMonitorIds == null || this.checkedMonitorIds.size === 0) {
-      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-edit'), '');
-      return;
-    }
-    if (this.checkedMonitorIds.size > 1) {
-      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.one-select-edit'), '');
-      return;
-    }
-    let monitorId = 0;
-    this.checkedMonitorIds.forEach(item => (monitorId = item));
-    this.router.navigateByUrl(`/monitors/${monitorId}/edit`);
   }
 
   onDeleteOneMonitor(monitorId: number) {
@@ -162,6 +213,28 @@ export class MonitorListComponent implements OnInit {
     });
   }
 
+  onExportMonitors() {
+    if (this.checkedMonitorIds == null || this.checkedMonitorIds.size == 0) {
+      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-export'), '');
+      return;
+    }
+    this.isSwitchExportTypeModalVisible = true;
+  }
+
+  onImportMonitors(info: NzUploadChangeParam): void {
+    if (info.file.response) {
+      this.tableLoading = true;
+      const message = info.file.response;
+      if (message.code === 0) {
+        this.notifySvc.success(this.i18nSvc.fanyi('common.notify.import-success'), '');
+        this.loadMonitorTable();
+      } else {
+        this.tableLoading = false;
+        this.notifySvc.error(this.i18nSvc.fanyi('common.notify.import-fail'), message.msg);
+      }
+    }
+  }
+
   deleteMonitors(monitors: Set<number>) {
     if (monitors == null || monitors.size == 0) {
       this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-delete'), '');
@@ -173,6 +246,7 @@ export class MonitorListComponent implements OnInit {
         deleteMonitors$.unsubscribe();
         if (message.code === 0) {
           this.notifySvc.success(this.i18nSvc.fanyi('common.notify.delete-success'), '');
+          this.updatePageIndex(monitors.size);
           this.loadMonitorTable();
         } else {
           this.tableLoading = false;
@@ -185,6 +259,59 @@ export class MonitorListComponent implements OnInit {
         this.notifySvc.error(this.i18nSvc.fanyi('common.notify.delete-fail'), error.msg);
       }
     );
+  }
+
+  updatePageIndex(delSize: number) {
+    const lastPage = Math.max(1, Math.ceil((this.total - delSize) / this.pageSize));
+    this.pageIndex = this.pageIndex > lastPage ? lastPage : this.pageIndex;
+  }
+
+  exportMonitors(type: string) {
+    if (this.checkedMonitorIds == null || this.checkedMonitorIds.size == 0) {
+      this.notifySvc.warning(this.i18nSvc.fanyi('common.notify.no-select-export'), '');
+      return;
+    }
+    switch (type) {
+      case 'JSON':
+        this.exportJsonButtonLoading = true;
+        break;
+      case 'EXCEL':
+        this.exportExcelButtonLoading = true;
+        break;
+      case 'YAML':
+        this.exportYamlButtonLoading = true;
+        break;
+    }
+    const exportMonitors$ = this.monitorSvc
+      .exportMonitors(this.checkedMonitorIds, type)
+      .pipe(
+        finalize(() => {
+          this.exportYamlButtonLoading = false;
+          this.exportExcelButtonLoading = false;
+          this.exportJsonButtonLoading = false;
+          exportMonitors$.unsubscribe();
+        })
+      )
+      .subscribe(
+        response => {
+          const message = response.body!;
+          if (message.type == 'application/json') {
+            this.notifySvc.error(this.i18nSvc.fanyi('common.notify.export-fail'), '');
+          } else {
+            const blob = new Blob([message], { type: response.headers.get('Content-Type')! });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.download = response.headers.get('Content-Disposition')!.split(';')[1].split('filename=')[1];
+            a.href = url;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            this.isSwitchExportTypeModalVisible = false;
+          }
+        },
+        error => {
+          this.notifySvc.error(this.i18nSvc.fanyi('common.notify.export-fail'), error.msg);
+        }
+      );
   }
 
   onCancelManageMonitors() {
@@ -291,6 +418,7 @@ export class MonitorListComponent implements OnInit {
 
   // begin: 列表多选逻辑
   checkedAll: boolean = false;
+
   onAllChecked(checked: boolean) {
     if (checked) {
       this.monitors.forEach(monitor => this.checkedMonitorIds.add(monitor.id));
@@ -298,6 +426,7 @@ export class MonitorListComponent implements OnInit {
       this.checkedMonitorIds.clear();
     }
   }
+
   onItemChecked(monitorId: number, checked: boolean) {
     if (checked) {
       this.checkedMonitorIds.add(monitorId);
@@ -305,6 +434,7 @@ export class MonitorListComponent implements OnInit {
       this.checkedMonitorIds.delete(monitorId);
     }
   }
+
   // end: 列表多选逻辑
 
   notifyCopySuccess() {
@@ -320,6 +450,11 @@ export class MonitorListComponent implements OnInit {
     const { pageSize, pageIndex, sort, filter } = params;
     this.pageIndex = pageIndex;
     this.pageSize = pageSize;
-    this.loadMonitorTable();
+    const currentSort = sort.find(item => item.value !== null);
+    const sortField = (currentSort && currentSort.key) || null;
+    const sortOrder = (currentSort && currentSort.value) || null;
+    this.changeMonitorTable(sortField, sortOrder);
   }
+
+  protected readonly sliceTagName = formatTagName;
 }

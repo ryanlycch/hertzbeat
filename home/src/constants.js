@@ -5,57 +5,45 @@ import Translate, { translate } from '@docusaurus/Translate'
 export const features = [
   {
     title: translate({
-      message: '开箱即用',
+      message: 'convenient',
     }),
     description: (
       <>
         <Translate
           values={{
-            docker: <code>{'docker run -d -p 1157:1157 tancloud/hertzbeat'}</code>,
-            TANCLOUD: <strong>TANCLOUD</strong>,
-            SAAS: <strong>SAAS</strong>,
+            docker: <code>{'docker run -d -p 1157:1157 -p 1158:1158 tancloud/hertzbeat'}</code>,
             console: (
               <a href={'https://www.console.tancloud.cn'}>
-                <strong>Login Now</strong>
+                Login Now
               </a>
             ),
             br: <br />,
           }}
         >
-          {'{docker} {br} 一条命令即可开始监控之旅。监控系统集指标采集，指标数据可视化，告警转发一体化。' +
-            '一站式全功能，无需为了加一个监控或告警而去编写繁琐的配置文件。{br}' +
-            '我们也提供 {TANCLOUD} {SAAS}云版本，{console}即可开始您的服务监控。' +
-            '安全是最重要的，我们对账户密钥和监控密钥全链路加密。'}
+          {'convenient-content'}
         </Translate>
       </>
     ),
   },
   {
     title: translate({
-      message: '多支持与自定义',
+      message: 'custom-multi-support',
     }),
     description: (
       <>
         <Translate
           values={{
-            custom: (
-              <a href={'/docs/advanced/extend-point'}>
-                <strong>Custom-Monitoring</strong>
-              </a>
-            ),
             br: <br />,
           }}
         >
-          {'我们支持对网站，JVM，MYSQL，Linux等应用服务，数据库，操作系统，中间件的监控，更多监控类型正在快速迭代中。' +
-            '更自由化的阈值告警配置，支持邮箱，短信，webhook，钉钉，企业微信，飞书机器人等告警通知。{br}' +
-            '不同团队的监控需求千变万化，我们提供{custom}，通过不同的协议SSH，JDBC，JMX，SNMP，HTTP等，仅需配置YML就能自定义监控指标并快速接入监控系统。'}
+          {'custom-multi-support-content'}
         </Translate>
       </>
     ),
   },
   {
     title: translate({
-      message: '拥抱开源',
+      message: 'opensource',
     }),
     description: (
       <>
@@ -63,21 +51,18 @@ export const features = [
           values={{
             github: (
               <a href={'https://github.com/dromara/hertzbeat'}>
-                <strong>HertzBeat Code Github</strong>
+                HertzBeat Code Github
               </a>
             ),
             gitee: (
               <a href={'https://gitee.com/dromara/hertzbeat'}>
-                <strong>HertzBeat Code Gitee</strong>
+                HertzBeat Code Gitee
               </a>
             ),
             br: <br />,
           }}
         >
-          {'HertzBeat监控系统代码全开源，无限制，非常欢迎任何对此有兴趣的同学参与中来，贡献不分大小，我们尊重每一位同学，不限于文档代码或者错别字的贡献，我们一起学习进步，构建属于贡献者们的开源事业。{br}' +
-            '中二的我们相信开源改变世界！{br}' +
-            '{github} {br}' +
-            '{gitee}'}
+          {'opensource-content'}
         </Translate>
       </>
     ),
@@ -95,7 +80,7 @@ export const dromaraFriends = [
     img: 'jpom_logo.png',
     remoteImg: 'https://plus.hutool.cn/images/dromara/jpom.png',
     alt: 'jpom',
-    url: 'https://jpom.io/',
+    url: 'https://jpom.top/',
   },
   {
     img: 'fast_request_logo.gif',
@@ -119,7 +104,7 @@ export const dromaraFriends = [
     img: 'satoken_logo.png',
     remoteImg: 'https://plus.hutool.cn/images/dromara/sa-token.png',
     alt: 'Sa-Token',
-    url: 'http://sa-token.dev33.cn/',
+    url: 'https://sa-token.cc/',
   },
   {
     img: 'koalas_rpc_logo.png',
@@ -129,7 +114,7 @@ export const dromaraFriends = [
   },
   {
     img: 'liteflow_logo.png',
-    remoteImg: 'https://plus.hutool.cn/images/dromara/liteflow.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/liteflow.png',
     alt: 'LiteFlow',
     url: 'https://yomahub.com/liteflow/',
   },
@@ -179,7 +164,7 @@ export const dromaraFriends = [
     img: 'northstar_logo.png',
     remoteImg: 'https://plus.hutool.cn/images/dromara/northstar_logo.png',
     alt: 'northstar',
-    url: 'https://gitee.com/dromara/northstar',
+    url: 'https://www.quantit.tech',
   },
   {
     img: 'mendmix_logo.png',
@@ -216,6 +201,96 @@ export const dromaraFriends = [
     remoteImg: 'https://plus.hutool.cn/images/dromara/go-view.png',
     alt: 'go-view',
     url: 'https://gitee.com/dromara/go-view',
+  },
+  {
+    img: 'neutrino-proxy_logo.png',
+    remoteImg: 'https://neutrino-proxy.oss-cn-hangzhou.aliyuncs.com/logo-text-cross-0.5x.png',
+    alt: 'neutrino-proxy',
+    url: 'https://gitee.com/dromara/neutrino-proxy',
+  },
+  {
+    img: 'ruoyi_vue_plus_logo.png',
+    remoteImg: 'https://foruda.gitee.com/images/1679673773341074847/178e8451_1766278.png',
+    alt: 'RuoYi-Vue-Plus',
+    url: 'https://javalionli.gitee.io/plus-doc',
+  },
+  {
+    img: 'stream-query_logo.png',
+    remoteImg: 'https://waibi.oss-cn-chengdu.aliyuncs.com/picGo/logo.png',
+    alt: 'stream-query',
+    url: 'https://dromara.gitee.io/stream-query',
+  },
+  {
+    img: 'sms_aggregator_logo.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/sms4j.png',
+    alt: 'SMS4J',
+    url: 'https://wind.kim',
+  },
+  {
+    img: 'cloudeon.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/cloudeon.png',
+    alt: 'CloudEon',
+    url: 'https://cloudeon.top/',
+  },
+  {
+    img: 'hodor.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/hodor.png',
+    alt: 'Hodor',
+    url: 'https://github.com/dromara/hodor',
+  },
+  {
+    img: 'test-hub.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/test-hub.png',
+    alt: 'TestHub',
+    url: 'http://nsrule.com/',
+  },
+  {
+    img: 'disjob.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/disjob-2.png',
+    alt: 'DisJob',
+    url: 'https://gitee.com/dromara/disjob',
+  },
+  {
+    img: 'Binlog4j.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/Binlog4j.png',
+    alt: 'Binlog4J',
+    url: 'https://gitee.com/dromara/binlog4j',
+  },
+  {
+    img: 'yft-design.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/yft-design.png',
+    alt: 'yft-design',
+    url: 'https://gitee.com/dromara/yft-design',
+  },
+  {
+    img: 'file4j.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/file4j.png',
+    alt: 'file4j',
+    url: 'https://gitee.com/dromara/spring-file-storage',
+  },
+  {
+    img: 'wemq.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/wemq.png',
+    alt: 'WeMQ',
+    url: 'https://wemq.nicholasld.cn/',
+  },
+  {
+    img: 'mayfly-go.png',
+    remoteImg: 'https://oss.dev33.cn/sa-token/link/mayfly-go.png',
+    alt: 'Mayfly-Go',
+    url: 'https://gitee.com/dromara/mayfly-go',
+  },
+  {
+    img: 'akali.svg',
+    remoteImg: 'https://akali.yomahub.com/logo.svg',
+    alt: 'akali',
+    url: 'https://akali.yomahub.com/',
+  },
+  {
+    img: 'dbswitch.png',
+    remoteImg: 'https://dbswitch.gitee.io/docs-site/images/logo.png',
+    alt: 'dbswitch',
+    url: 'https://dbswitch.gitee.io/docs-site/#/',
   }
 ]
 
@@ -225,6 +300,11 @@ export const friendsLink = [
     alt: 'hippo4j',
     url: 'https://hippo4j.cn/',
   },
+  {
+    img: 'bugstack_logo.png',
+    alt: 'bugStack',
+    url: 'https://bugstack.cn/',
+  }
 ]
 
 export const usersLink = [
@@ -253,13 +333,3 @@ export const usersLink = [
     alt: 'hibobi',
   }
 ]
-
-export const SetupExample = `
-<dependency>
-    <groupId>com.usthe.sureness</groupId>
-    <artifactId>sureness-core</artifactId>
-    <version>1.0.6</version>
-</dependency>
-
-compile group: 'com.usthe.sureness', name: 'sureness-core', version: '1.0.6'
-`
